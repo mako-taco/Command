@@ -4,7 +4,9 @@ A functional Undo / Redo library for JavaScript
 
 Performing Actions
 -----
-To perform an undoable action, use `Command.do`.
+To perform an undoable action, use `Command.do`, which takes two function
+arguments. The first is the action you want to perform right now, and the
+second is the 'undo' function.
 ```javascript
 var x = 5;
 
@@ -68,4 +70,56 @@ If you happen to call `Command.undo` or `Command.redo` after calling `Command.bu
 but before calling `Command.stop`, the buffer will be destroyed and the steps will 
 forever be treated as atomic actions.
 
+Common Patterns
+-----
+In most cases, you should rely on the magic of closures to remember your two states.
+I like to use variables prefixed with `old` and `new` to help keep this organized.
+```javascript
+var myValue = "Hello";
 
+//...
+var oldValue = myValue,
+  newValue = "Goodbye";
+  
+Command.do(function() {
+  myValue = newValue;
+}, function() {
+  myValue = oldValue;
+});
+```
+The order of your statements inside the `do` and `undo` functions is very important.
+In general, if `do` A, then B, then C, you want to `undo` C, then B, then A.
+```javascript
+var num = 5,
+  num2 = 5;
+
+//incorrect!
+var doBadMath = function(n) {
+  Command.do(function() {
+    num *= n; //A
+    num += n; //B
+  }, function() {
+    num /= n; //A
+    num -= n; //B
+  });  
+};
+
+//correct!
+var doMath = function(n) {
+  Command.do(function() {
+    num2 *= n; //A
+    num2 += n; //B
+  }, function() {
+    num2 -= n; //B
+    num2 /= n; //A
+  });  
+};
+
+doBadMath(3); 
+doMath(3);
+//num = 18, num2 = 18
+
+Command.undo();
+Command.undo();
+//num = 3, num2 = 5
+```
