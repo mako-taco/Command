@@ -4,7 +4,7 @@ A functional Undo / Redo library for JavaScript
 
 Performing Actions
 -----
-To perform an undoable action, use `Command.do`, which takes two function
+To perform an undoable action, use `Command.do(up, down)`, which takes two function
 arguments. The first is the action you want to perform right now, and the
 second is the 'undo' function.
 ```javascript
@@ -27,9 +27,10 @@ Command.redo();
 Buffering Actions
 -----
 Sometimes, you will want to group multiple actions into a single action.
-To do this, use `Command.bufferAction` or `Command.buffer` for short. This
+To do this, use `Command.bufferAction()` or `Command.buffer()` for short. This
 is particularly useful when you encapsulate atomic actions in functions, 
-but want to treat a group of them as a single action in the undo stack.
+but want to treat a group of them as a single action in the undo stack. End the
+buffer with `Command.stopBuffer()` or `Command.stop()`.
 
 ```javascript
 var x = 5,
