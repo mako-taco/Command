@@ -1,11 +1,11 @@
 (function() {
 	var doChain = [];
 	var undoChain = [];
-	var maxLength = 100;
 	var buffer = [];
 	var buffering = false;
 
 	var Command = {	
+		maxLength: 500,
 		do: function(up, down) {
 			if(!up) {
 				throw "Command.do missing required parameter 'up'."
@@ -26,7 +26,7 @@
 				undoChain = [];
 				action.up();
 				doChain.push(action);
-				while(doChain.length > maxLength) {
+				while(doChain.length > this.maxLength) {
 					doChain.shift();
 				}
 			}
@@ -34,7 +34,8 @@
 
 		undo: function() {
 			if(buffering) {
-				this.clearBuffer();
+				buffering = false;
+				buffer = [];
 			}
 
 			var undone = doChain.pop();
@@ -49,7 +50,8 @@
 
 		redo: function() {
 			if(buffering) {
-				this.clearBuffer();
+				buffering = false;
+				buffer = [];
 			}
 
 			var redone = undoChain.pop();
@@ -93,14 +95,9 @@
 
 			undoChain = [];
 			doChain.push(action);
-			while(doChain.length > maxLength) {
+			while(doChain.length > this.maxLength) {
 				doChain.shift();
 			}
-		},
-
-		clearBuffer: function() {
-			buffer = [];
-			buffering = false;
 		}
 	};
 
