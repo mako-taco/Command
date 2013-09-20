@@ -72,6 +72,7 @@ forever be treated as atomic actions.
 
 Common Patterns
 -----
+###Keeping track of Closure
 In most cases, you should rely on the magic of closures to remember your two states.
 I like to use variables prefixed with `old` and `new` to help keep this organized.
 ```javascript
@@ -87,6 +88,7 @@ Command.do(function() {
   myValue = oldValue;
 });
 ```
+###Order of Operations
 The order of your statements inside the `do` and `undo` functions is very important.
 In general, if `do` A, then B, then C, you want to `undo` C, then B, then A.
 ```javascript
