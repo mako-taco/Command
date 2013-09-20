@@ -1,6 +1,7 @@
 Command
 =======
-A functional Undo / Redo library for JavaScript
+A functional Undo / Redo library for JavaScript. Command creates a variable on window 
+called `Command` which you use to perform your actions.
 
 Performing Actions
 -----
