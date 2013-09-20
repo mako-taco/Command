@@ -35,6 +35,7 @@
 		undo: function() {
 			if(buffering) {
 				buffering = false;
+				//should actually undo the BUFFER here!
 				buffer = [];
 			}
 
@@ -100,6 +101,9 @@
 			}
 		}
 	};
+
+	Command.stop = Command.stopBuffer;
+	Command.buffer = Command.bufferActions;
 
 	window.Command = Command;
 })();

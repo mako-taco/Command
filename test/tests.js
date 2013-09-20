@@ -1,5 +1,7 @@
 test( "Command", function() {
 	ok(window.hasOwnProperty("Command"), "Passed!");
+	ok(Command.buffer === Command.bufferActions, "Command.buffer aliases Command.bufferActions");
+	ok(Command.stop === Command.stopBuffer, "Command.stop aliases Command.stopBuffer");
 });
 
 test("Do, Undo, Redo", function() {
