@@ -98,3 +98,45 @@ test("Buffered actions", function() {
 	Command.redo();
 	ok(a === 5, "1x Redo after stopping the buffer / undoing should apply all buffered actions");
 });
+
+test("Multiple calls to buffer", function() {
+	var a = 100;
+
+	var divideBy2AndAdd5 = function() {
+		Command.buffer();
+		
+		Command.do(function() {
+			a /= 2;
+		}, function() {
+			a *= 2;
+		});
+
+		Command.do(function() {
+			a += 5;
+		}, function() {
+			a -= 5;
+		});
+
+		Command.stopBuffer();
+	}
+
+	Command.buffer();
+
+	var oldA = a;
+	Command.do(function() {
+ 		a %= 7;
+	}, function() {
+		a = oldA;
+	})
+
+	divideBy2AndAdd5();
+
+	Command.stopBuffer();
+	ok(a === 6, "shouln't affect functionality");
+
+	Command.undo();
+	ok(a === 100, "should all undo after the buffer is stopped that many times");
+
+	Command.redo();
+	ok(a === 6, "should redo as a single action after the buffer is stopped that many times (" + a + " === 6?)" );
+})

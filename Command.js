@@ -2,7 +2,7 @@
 	var doChain = [];
 	var undoChain = [];
 	var buffer = [];
-	var buffering = false;
+	var buffering = 0;
 
 	var Command = {	
 		maxLength: 500,
@@ -21,7 +21,8 @@
 				};
 
 				if(buffering) {
-					buffer[buffer.length] = action;
+					var curBuffer = buffer[buffering];
+					curBuffer[curBuffer.length] = action;
 				}
 				undoChain = [];
 				action.up();
@@ -34,7 +35,7 @@
 
 		undo: function() {
 			if(buffering) {
-				buffering = false;
+				buffering = 0;
 				//should actually undo the BUFFER here!
 				buffer = [];
 			}
@@ -51,7 +52,7 @@
 
 		redo: function() {
 			if(buffering) {
-				buffering = false;
+				buffering = 0;
 				buffer = [];
 			}
 
@@ -66,15 +67,15 @@
 		},
 
 		bufferActions: function() {
-			buffering = true;
+			buffering++;
+			buffer[buffering] = [];
 		},
 
 		stopBuffer: function() {
-			if(!buffering) return;
+			if(buffering <= 0) return;
 
-			buffering = false;
-			var stored = buffer.slice();
-			buffer = [];
+			var stored = buffer[buffering].slice();
+			buffer[buffering] = [];
 			
 			var n = stored.length;
 			for(var i=0; i<n; i++) {
@@ -94,16 +95,28 @@
 				}
 			}
 
-			undoChain = [];
-			doChain.push(action);
-			while(doChain.length > this.maxLength) {
-				doChain.shift();
+			buffering--;
+			if(buffering) {
+				var curBuffer = buffer[buffering];
+				curBuffer[curBuffer.length] = action;
 			}
+			else {
+				undoChain = [];
+				doChain.push(action);
+				while(doChain.length > this.maxLength) {
+					doChain.shift();
+				}
+			}
+
+		},
+
+		clearBuffer: function() {
+			buffering = 0;
+			buffer = [];
 		}
 	};
 
 	Command.stop = Command.stopBuffer;
 	Command.buffer = Command.bufferActions;
-
 	window.Command = Command;
 })();
